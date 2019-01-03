@@ -157,7 +157,7 @@ void all_pid_init()
     pid_init(&motor_pid[i]);
     motor_pid[i].f_param_init(&motor_pid[i],
 																	PID_Speed,					
-																	3500,							//maxOutput												//输出限幅
+																	4000,							//maxOutput												//输出限幅
 																	1000,								//integralLimit										//积分限幅
 																	10,									//deadband												//死区（绝对值）
 																	0,									//controlPeriod										//控制周期
@@ -172,7 +172,7 @@ void all_pid_init()
 	 pid_init(&motor_pid[6]);
     motor_pid[6].f_param_init(&motor_pid[6],
 																	PID_Speed,					
-																	3500,							//maxOutput												//输出限幅
+																	4000,							//maxOutput												//输出限幅
 																	1000,								//integralLimit										//积分限幅
 																	10,									//deadband												//死区（绝对值）
 																	0,									//controlPeriod										//控制周期
@@ -181,6 +181,19 @@ void all_pid_init()
 																	1.8,								//kp
 																	0.08,							//ki	
 																	0.01);							//kd
+	
+	pid_init(&motor_pid[7]);
+    motor_pid[7].f_param_init(&motor_pid[7],
+																	PID_Speed,					
+																	4000,							//maxOutput												//输出限幅
+																	1000,								//integralLimit										//积分限幅
+																	10,									//deadband												//死区（绝对值）
+																	0,									//controlPeriod										//控制周期
+																	5000,								//max_err													//最大误差
+																	0,									//target
+																	4.5,								//kp
+																	0.08,							//ki	
+																	0.06);							//kd
 
 	
 //	#ifdef QUADROTOR_YUNTAI

@@ -26,7 +26,7 @@
 
 
 moto_measure_t moto_chassis[7] = {0};//4 chassis moto
-
+moto_measure_t moto1_chassis[7] = {0};//4 chassis moto
 
 
 void get_total_angle(moto_measure_t *ptr);
@@ -45,9 +45,11 @@ void my_can_filter_init_recv_all(CAN_HandleTypeDef* _hcan)
 	CAN_FilterConfTypeDef		CAN_FilterConfigStructure;
 	static CanTxMsgTypeDef		Tx1Message;
 	static CanRxMsgTypeDef 		Rx1Message;
+	static CanTxMsgTypeDef		Tx2Message;
+	static CanRxMsgTypeDef 		Rx2Message;
 
 
-	CAN_FilterConfigStructure.FilterNumber = 0;
+//	CAN_FilterConfigStructure.FilterNumber = 0;
 	CAN_FilterConfigStructure.FilterMode = CAN_FILTERMODE_IDMASK;
 	CAN_FilterConfigStructure.FilterScale = CAN_FILTERSCALE_32BIT;
 	CAN_FilterConfigStructure.FilterIdHigh = 0x0000;
@@ -58,19 +60,32 @@ void my_can_filter_init_recv_all(CAN_HandleTypeDef* _hcan)
 	CAN_FilterConfigStructure.BankNumber = 14;//can1(0-13)和can2(14-27)分别得到一半的filter
 	CAN_FilterConfigStructure.FilterActivation = ENABLE;
 
-	if(HAL_CAN_ConfigFilter(_hcan, &CAN_FilterConfigStructure) != HAL_OK)
-	{
-		//err_deadloop(); //show error!
-	}
+//	if(HAL_CAN_ConfigFilter(_hcan, &CAN_FilterConfigStructure) != HAL_OK)
+//	{
+//		//err_deadloop(); //show error!
+//	}
+
+	if(_hcan == &hcan1)
+  {
+    CAN_FilterConfigStructure.FilterNumber = 0;
+    _hcan->pTxMsg = &Tx1Message;
+    _hcan->pRxMsg = &Rx1Message;
+  }
+  if(_hcan == &hcan2)
+  {
+		CAN_FilterConfigStructure.FilterNumber = 14;
+    _hcan->pTxMsg = &Tx2Message;
+    _hcan->pRxMsg = &Rx2Message;
+  }
+	HAL_CAN_ConfigFilter(_hcan, &CAN_FilterConfigStructure);
 
 
-	if(_hcan == &hcan1){
-		_hcan->pTxMsg = &Tx1Message;
-		_hcan->pRxMsg = &Rx1Message;
-	}
+
 
 
 }
+
+
 
 uint32_t FlashTimer;
 /*******************************************************************************************
@@ -89,7 +104,6 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
 		FlashTimer = HAL_GetTick();
 		
 	}
-
 	//ignore can1 or can2.
 	switch(_hcan->pRxMsg->StdId){
 		case CAN_3508Moto1_ID:
@@ -102,8 +116,14 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
 			{
 				static u8 i;
 				i = _hcan->pRxMsg->StdId - CAN_3508Moto1_ID;
-				
-				get_moto_measure(&moto_chassis[i], _hcan);
+				if(_hcan->Instance==CAN1){
+					get_moto_measure(&moto_chassis[i], _hcan);
+					__HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
+				}
+					if(_hcan->Instance==CAN2){
+					get_moto_measure(&moto1_chassis[i], _hcan);
+						__HAL_CAN_ENABLE_IT(&hcan2, CAN_IT_FMP0);
+				}
 			}
 			break;
 		
@@ -111,8 +131,8 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* _hcan)
 	}
 		
 	/*#### add enable can it again to solve can receive only one ID problem!!!####**/
-	__HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
-
+//	__HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
+//	__HAL_CAN_ENABLE_IT(&hcan2, CAN_IT_FMP0);
 
 }
 

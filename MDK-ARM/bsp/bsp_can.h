@@ -77,11 +77,13 @@ typedef struct{
 
 /* Extern  ------------------------------------------------------------------*/
 extern moto_measure_t  moto_chassis[];
+extern moto_measure_t  moto1_chassis[];
 
 //void set_rammer_current(CAN_HandleTypeDef* hcan,  s16 iq3);发射机构
 //void set_pan_tilt_current(CAN_HandleTypeDef* hcan, s16 iq1, s16 iq2);云台   工程车暂不需要
 void my_can_filter_init(CAN_HandleTypeDef* hcan);
 void my_can_filter_init_recv_all(CAN_HandleTypeDef* _hcan);
+void my_can_filter_init_recv_all2(CAN_HandleTypeDef* _hcan);
 void can_filter_recv_special(CAN_HandleTypeDef* hcan, uint8_t filter_number, uint16_t filtered_id);
 void get_moto_measure(moto_measure_t *ptr, CAN_HandleTypeDef* hcan);
 void can_receive_onetime(CAN_HandleTypeDef* _hcan, int time);

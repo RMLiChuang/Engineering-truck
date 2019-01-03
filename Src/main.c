@@ -28,7 +28,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-PID_TypeDef motor_pid[7];//初始化7个电机的pid结构体 其中0 1 2 3对应底盘电机，4 5 对应云台电机 6对应拨弹电机，目前只用到了0 1 2 3 6号电机
+PID_TypeDef motor_pid[8];//初始化7个电机的pid结构体 其中0 1 2 3对应底盘电机，4 5 6对应抬升机构
 
 uint16_t TIM_COUNT[2];
 #define SpeedStep 500
@@ -74,6 +74,7 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_CAN1_Init();//can通信
+	MX_CAN2_Init();//can2通信
   MX_USART1_UART_Init();//遥控器接收，串口中断
   MX_TIM1_Init();//用来计时，测试程序运行的时间
   MX_TIM5_Init();//产生4路pwm波来控制摩擦轮
@@ -93,7 +94,10 @@ int main(void)
 	PH10     ------> TIM5_CH1 
 	*/
 my_can_filter_init_recv_all(&hcan1);     //配置CAN过滤器
-  HAL_CAN_Receive_IT(&hcan1, CAN_FIFO0);   //启动CAN接收中断
+my_can_filter_init_recv_all(&hcan2);     //配置CAN过滤器
+HAL_CAN_Receive_IT(&hcan1, CAN_FIFO0);   //启动CAN接收中断
+HAL_CAN_Receive_IT(&hcan2, CAN_FIFO0);   //启动CAN接收中断
+//	HAL_CAN_Receive_IT(&hcan2, CAN_FIFO0);   //启动CAN接收中断
   HAL_UART_Receive_IT_IDLE(&huart1,UART_Buffer,100);   //启动串口接收
 	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_2);
@@ -120,6 +124,48 @@ my_can_filter_init_recv_all(&hcan1);     //配置CAN过滤器
   /* USER CODE BEGIN WHILE */
   while (1)
   {	
+		if(flag==1)
+		{
+			Ts=0;
+			while(Ts<3)
+			{
+			set_moto_current(&hcan1,1000,-1000,-1000,1000);
+			}
+			Ts=0;
+			while(Ts<3)
+			{
+				set_moto_current(&hcan1,-1000,1000,1000,-1000);
+			}	
+			set_moto_current(&hcan1,0,0,0,0);
+			Ts=0;
+			while(Ts<2)
+			{
+				
+				set_upthrow_current(&hcan1,0,2000,2000);
+			}	
+			Ts=0;
+				while(Ts<2)
+			{
+				set_upthrow_current(&hcan1,0,-2000,-2000);
+			}	
+			set_upthrow_current(&hcan1,0,0,0);
+			flag=0;
+		}
+		
+//		if(flag2==0&&flag==1)//flag有从0到1的变化 执行一个自动上岛程序
+//		{
+////			Ts=0;
+////			while(Ts<3)
+////			{
+//			set_moto_current(&hcan1,1000,1000,1000,1000);
+////			}
+////			Ts=0;
+////			while(Ts<3)
+////			{
+////				set_moto_current(&hcan1,-1000,-1000,-1000,-1000);
+////			}	
+//		}
+//		
 		
 		
   /* USER CODE END WHILE */
@@ -147,12 +193,12 @@ my_can_filter_init_recv_all(&hcan1);     //配置CAN过滤器
 //	  wave_form_data[3] =(short)imu_9250.ax;
 //	  wave_form_data[4] =(short)imu_9250.ay;motor_pid[5].target
 //	  wave_form_data[5] =(short)imu.wy;
-		wave_form_data[0] =(short)motor_pid[4].target;//err
-	  wave_form_data[1] =(short)moto_chassis[4].speed_rpm;//
-	  wave_form_data[2] =(short)motor_pid[4].measure;//抬升PID目标
+		wave_form_data[0] =(short)flag;//err
+	  wave_form_data[1] =(short)flag;//
+	  wave_form_data[2] =(short)Ts;//抬升PID目标
 	  wave_form_data[3] =(short)motor_pid[4].output;//抬升PID实际
 	  wave_form_data[4] =(short)motor_pid[5].output;//抬升输出
-	  wave_form_data[5] =(short)motor_pid[4].err;//抬升机构2
+	  wave_form_data[5] =(short)motor_pid[0].output;;//抬升机构2
 		shanwai_send_wave_form();   //将数据传输到三外上位机，可以看到实时波形
   }
   /* USER CODE END 3 */

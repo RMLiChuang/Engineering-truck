@@ -117,9 +117,10 @@ void footstep_control()
 //  motor_pid[2].target=moto_ctr[2]*4000/660;
 //  motor_pid[3].target=moto_ctr[3]*4000/660;
 		
-	motor_pid[4].target=remote_control.ch4*4000/660;
-	motor_pid[5].target=(remote_control.ch2+remote_control.ch1)*4000/660;	
-	motor_pid[6].target=(remote_control.ch2-remote_control.ch1)*4000/660;	
+	motor_pid[4].target=(remote_control.ch4-remote_control.ch3)*7000/660;	
+	motor_pid[5].target=(remote_control.ch2+remote_control.ch1)*7000/660;	
+	motor_pid[6].target=(remote_control.ch2-remote_control.ch1)*7000/660;	
+	motor_pid[7].target=(remote_control.ch4+remote_control.ch3)*7000/660;	
 		
 //		if((motor_pid[0].target>4000)&&(motor_pid[1].target>4000)&&(motor_pid[2].target>4000)&&(motor_pid[3].target>4000))			//顺转速度控制
 //		{
@@ -144,7 +145,8 @@ void footstep_control()
 	motor_pid[4].f_cal_pid(&motor_pid[4],moto_chassis[4].speed_rpm);    //根据设定值进行PID计算。
 	motor_pid[5].f_cal_pid(&motor_pid[5],moto_chassis[5].speed_rpm);    //根据设定值进行PID计算。
 	motor_pid[6].f_cal_pid(&motor_pid[6],moto_chassis[6].speed_rpm); 
-
+	
+	motor_pid[7].f_cal_pid(&motor_pid[7],moto1_chassis[4].speed_rpm);    //根据设定值进行PID计算。//前为目标  后为电机号
 	
 	
 //	set_moto_current(&hcan1,motor_pid[0].output,   //将PID的计算结果通过CAN发送到电机
@@ -154,14 +156,42 @@ void footstep_control()
 		
 	set_upthrow_current(&hcan1,motor_pid[4].output,   //将PID的计算结果通过CAN发送到电机
 														motor_pid[5].output,
-														motor_pid[6].output);
+														motor_pid[6].output);//6.7
+	set_upthrow_current(&hcan2,motor_pid[7].output,   //将PID的计算结果通过CAN发送到电机
+														0,
+														0);
 	}
 }
 
-
 /***************************************************/
-
-
+void auto_footstep_control()
+{
+	
+	if(remote_control.switch_left!=3&&remote_control.switch_right==2)
+	{
+	
+	set_upthrow_current(&hcan1,3000,   //整体上升
+														3000,
+														3000);
+////	HAL_Delay(4000);//上升两秒
+//	set_moto_current(&hcan1,1000,1000,1000,1000);//前进
+////	HAL_Delay(800);//前进0.8秒
+//	set_upthrow_current(&hcan1,0,   //前轮收起
+//														-3000,
+//														-3000);
+////	HAL_Delay(4000);//前轮收起4秒
+//	set_moto_current(&hcan1,1000,1000,1000,1000);//前进
+////	HAL_Delay(1500);//前进1.5秒
+//	set_upthrow_current(&hcan1,-3000,   //后轮收起
+//														0,
+//														0);
+////	HAL_Delay(4000);//后轮收起1.5秒
+//	set_moto_current(&hcan1,0,0,0,0);//底盘停
+//	set_upthrow_current(&hcan1,0,   //上升停
+//														0,
+//														0);
+	}
+}		
 //extern int cnt_yuntai;
 //#ifdef INFANTRY_YUNTAI
 ///**

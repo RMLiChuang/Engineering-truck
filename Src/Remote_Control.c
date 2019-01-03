@@ -129,9 +129,9 @@ void DBUS_Deal()
    motor_pid[1].target=moto_ctr[1]*4000/660;
    motor_pid[2].target=moto_ctr[2]*4000/660;
    motor_pid[3].target=moto_ctr[3]*4000/660;
-	 motor_pid[4].target=moto_ctr[4]*4000/660;
-	 motor_pid[5].target=moto_ctr[5]*4000/660;
-	 motor_pid[6].target=moto_ctr[6]*4000/660;
+	 motor_pid[4].target=moto_ctr[4]*7000/660;
+	 motor_pid[5].target=moto_ctr[5]*7000/660;
+	 motor_pid[6].target=moto_ctr[6]*7000/660;
 	
 	if((motor_pid[0].target>THRESHOLD)&&(motor_pid[1].target>THRESHOLD)&&(motor_pid[2].target>THRESHOLD)&&(motor_pid[3].target>THRESHOLD))			//顺转速度控制
 		{

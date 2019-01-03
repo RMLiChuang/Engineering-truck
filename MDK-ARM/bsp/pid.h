@@ -76,7 +76,7 @@ void pid_init(PID_TypeDef* pid);
 #endif
 
 //extern PID_TypeDef pid_pitch;    
-extern PID_TypeDef motor_pid[7];
+extern PID_TypeDef motor_pid[8];
 extern PID_TypeDef pid_pitch,pid_pithch_speed,pid_roll,pid_roll_speed,pid_yaw_speed;
 
 

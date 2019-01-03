@@ -28,6 +28,7 @@
 "demo\myiic.o"
 "demo\delay.o"
 "demo\robomaster_filter.o"
+"demo\exti.o"
 "demo\main.o"
 "demo\stm32f4xx_hal_msp.o"
 "demo\usart.o"
